@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroGuía AI - Kiosco Interactivo de Aeropuerto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .bg-gradient-airport {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f766e 100%);
+        }
+    </style>
+</head>
+<body class="bg-gradient-airport min-h-screen text-slate-800 flex flex-col justify-between p-4 md:p-8">
+
+    <header class="max-w-5xl mx-auto w-full flex justify-between items-center bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/20 text-white shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-teal-500 p-3 rounded-xl shadow-lg">
+                <i class="fa-solid font-bold text-2xl fa-plane-departure"></i>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xl tracking-tight leading-none">AeroGuía <span class="text-teal-400">AI</span></h1>
+                <p class="text-xs text-slate-300 font-medium">Asistente Turístico de Aeropuerto</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-2 bg-slate-800/60 p-1.5 rounded-xl border border-white/10">
+            <i class="fa-solid fa-globe text-teal-400 ml-2"></i>
+            <select id="langSelect" onchange="changeLanguage()" class="bg-transparent text-sm text-white focus:outline-none cursor-pointer pr-2">
+                <option value="es" class="text-slate-900">Español</option>
+                <option value="en" class="text-slate-900">English</option>
+                <option value="fr" class="text-slate-900">Français</option>
+                <option value="pt" class="text-slate-900">Português</option>
+            </select>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto w-full flex-grow flex flex-col justify-center">
+
+        <!-- WIZARD -->
+        <div id="wizardCard" class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl transition-all duration-300">
+            <div class="mb-8 text-center">
+                <span id="stepBadge" class="bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Paso 1 de 4</span>
+                <h2 id="wizardTitle" class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2">¿Con quién viajas hoy?</h2>
+                <p id="wizardSubtitle" class="text-slate-500 text-sm mt-1">Personalizaremos tus opciones según tus preferencias.</p>
+            </div>
+
+            <!-- Paso 1 -->
+            <div id="step1" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button onclick="selectOption('travelerType', 'Solo', 1)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-user text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Solo</span>
+                </button>
+                <button onclick="selectOption('travelerType', 'Pareja', 1)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-user-group text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">En Pareja</span>
+                </button>
+                <button onclick="selectOption('travelerType', 'Familia', 1)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-people-roof text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">En Familia</span>
+                </button>
+                <button onclick="selectOption('travelerType', 'Negocios', 1)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-briefcase text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Negocios</span>
+                </button>
+            </div>
+
+            <!-- Paso 2 -->
+            <div id="step2" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                <button onclick="selectOption('timeAvailable', 'Escala corta (< 4h)', 2)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-clock text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Escala Corta (&lt; 4 horas)</span>
+                    <span class="text-xs text-slate-400">Recomendaciones dentro del aeropuerto</span>
+                </button>
+                <button onclick="selectOption('timeAvailable', 'Escala larga (4h - 12h)', 2)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-business-time text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Escala Media (4 - 12 horas)</span>
+                    <span class="text-xs text-slate-400">Tours rápidos por la ciudad</span>
+                </button>
+                <button onclick="selectOption('timeAvailable', 'Estancia (+24h)', 2)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-hotel text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Estancia (+24 horas)</span>
+                    <span class="text-xs text-slate-400">Hoteles, tours completos y gastronomía</span>
+                </button>
+            </div>
+
+            <!-- Paso 3 -->
+            <div id="step3" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                <button onclick="selectOption('budget', 'Económico', 3)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-wallet text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Económico ($)</span>
+                </button>
+                <button onclick="selectOption('budget', 'Moderado', 3)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-credit-card text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Moderado ($$)</span>
+                </button>
+                <button onclick="selectOption('budget', 'Premium/Lujo', 3)" class="p-5 rounded-2xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/50 flex flex-col items-center justify-center space-y-3 transition group">
+                    <i class="fa-solid fa-crown text-3xl text-slate-400 group-hover:text-teal-600"></i>
+                    <span class="font-bold text-sm text-slate-700">Premium / Lujo ($$$)</span>
+                </button>
+            </div>
+
+            <!-- Paso 4 -->
+            <div id="step4" class="hidden">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <label class="p-4 rounded-2xl border-2 border-slate-200 cursor-pointer flex flex-col items-center justify-center space-y-2 hover:border-teal-500 transition">
+                        <input type="checkbox" value="Gastronomía Local" class="interest-checkbox hidden" onchange="toggleInterest(this)">
+                        <i class="fa-solid fa-utensils text-2xl text-slate-400"></i>
+                        <span class="font-semibold text-xs text-slate-700">Gastronomía</span>
+                    </label>
+                    <label class="p-4 rounded-2xl border-2 border-slate-200 cursor-pointer flex flex-col items-center justify-center space-y-2 hover:border-teal-500 transition">
+                        <input type="checkbox" value="Cultura y Museos" class="interest-checkbox hidden" onchange="toggleInterest(this)">
+                        <i class="fa-solid fa-landmark text-2xl text-slate-400"></i>
+                        <span class="font-semibold text-xs text-slate-700">Cultura</span>
+                    </label>
+                    <label class="p-4 rounded-2xl border-2 border-slate-200 cursor-pointer flex flex-col items-center justify-center space-y-2 hover:border-teal-500 transition">
+                        <input type="checkbox" value="Relax y Lounge" class="interest-checkbox hidden" onchange="toggleInterest(this)">
+                        <i class="fa-solid fa-couch text-2xl text-slate-400"></i>
+                        <span class="font-semibold text-xs text-slate-700">Descanso</span>
+                    </label>
+                    <label class="p-4 rounded-2xl border-2 border-slate-200 cursor-pointer flex flex-col items-center justify-center space-y-2 hover:border-teal-500 transition">
+                        <input type="checkbox" value="Compras / Duty Free" class="interest-checkbox hidden" onchange="toggleInterest(this)">
+                        <i class="fa-solid fa-bag-shopping text-2xl text-slate-400"></i>
+                        <span class="font-semibold text-xs text-slate-700">Compras</span>
+                    </label>
+                </div>
+                <button onclick="generateRecommendations()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-2xl shadow-xl transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Generar Recomendaciones Inteligentes</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingState" class="hidden glass-panel rounded-3xl p-12 text-center shadow-2xl">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-teal-600 border-t-transparent mb-4"></div>
+            <h3 class="text-xl font-bold text-slate-800">Analizando tus preferencias con Inteligencia Artificial...</h3>
+            <p class="text-sm text-slate-500 mt-2">Buscando las mejores opciones en gastronomía, hospedaje y entretenimiento.</p>
+        </div>
+
+        <!-- Resultados -->
+        <div id="resultsCard" class="hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-4 flex justify-between items-center text-slate-800 shadow-md">
+                <div class="flex items-center space-x-2 text-sm font-semibold">
+                    <span id="profileSummary" class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs">Perfil</span>
+                </div>
+                <button onclick="resetWizard()" class="text-xs text-slate-500 hover:text-slate-800 font-bold underline flex items-center space-x-1">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Cambiar Perfil</span>
+                </button>
+            </div>
+
+            <!-- Ciudad recomendada -->
+            <div id="cityRecommendation" class="glass-panel rounded-3xl p-6 md:p-7 shadow-xl border border-white/50">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-teal-100 text-teal-700 w-14 h-14 rounded-2xl flex items-center justify-center shrink-0">
+                            <i id="cityIcon" class="fa-solid fa-location-dot text-2xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-extrabold uppercase tracking-wider text-teal-700 mb-1">Ciudad recomendada para tu perfil</p>
+                            <div class="flex flex-wrap items-baseline gap-x-2">
+                                <h2 id="recommendedCityName" class="text-2xl md:text-3xl font-extrabold text-slate-900">Ciudad</h2>
+                                <span id="recommendedCityCountry" class="text-sm font-semibold text-slate-400">Colombia</span>
+                            </div>
+                            <p id="recommendedCityDescription" class="text-sm text-slate-600 mt-2 max-w-2xl"></p>
+                            <div id="recommendedCityTags" class="flex flex-wrap gap-2 mt-3"></div>
+                        </div>
+                    </div>
+                    <div class="md:min-w-[220px] bg-white/60 border border-slate-200 rounded-2xl p-4">
+                        <p class="text-[11px] font-bold uppercase tracking-wide text-slate-400 mb-2">También podrían gustarte</p>
+                        <div id="alternativeCities" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-3xl p-6 shadow-xl flex flex-col">
+                    <div class="flex items-center space-x-3 mb-4 text-teal-700">
+                        <i class="fa-solid fa-bed text-2xl"></i>
+                        <h3 class="font-bold text-lg">Alojamiento & Rest</h3>
+                    </div>
+                    <div id="accommodationsList" class="space-y-4 flex-grow"></div>
+                </div>
+
+                <div class="glass-panel rounded-3xl p-6 shadow-xl flex flex-col">
+                    <div class="flex items-center space-x-3 mb-4 text-orange-600">
+                        <i class="fa-solid fa-utensils text-2xl"></i>
+                        <h3 class="font-bold text-lg">Gastronomía</h3>
+                    </div>
+                    <div id="gastronomyList" class="space-y-4 flex-grow"></div>
+                </div>
+
+                <div class="glass-panel rounded-3xl p-6 shadow-xl flex flex-col">
+                    <div class="flex items-center space-x-3 mb-4 text-indigo-600">
+                        <i class="fa-solid fa-compass text-2xl"></i>
+                        <h3 class="font-bold text-lg">Actividades</h3>
+                    </div>
+                    <div id="activitiesList" class="space-y-4 flex-grow"></div>
+                </div>
+            </div>
+
+
+            <!-- Reseñas de la recomendación -->
+            <div class="glass-panel rounded-3xl p-6 shadow-xl space-y-5">
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <div class="flex items-center space-x-3 text-slate-800">
+                        <i class="fa-solid fa-star text-amber-500 text-xl"></i>
+                        <div>
+                            <h3 class="font-bold text-md">¿Qué te pareció la recomendación?</h3>
+                            <p class="text-xs text-slate-500">Déjanos una reseña sobre la ciudad sugerida.</p>
+                        </div>
+                    </div>
+                    <span id="reviewCityBadge" class="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold">Ciudad recomendada</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-[180px_1fr_auto] gap-3 items-end">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-2">Calificación</label>
+                        <select id="reviewRating" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                            <option value="5">★★★★★ Excelente</option>
+                            <option value="4">★★★★☆ Muy buena</option>
+                            <option value="3">★★★☆☆ Buena</option>
+                            <option value="2">★★☆☆☆ Regular</option>
+                            <option value="1">★☆☆☆☆ Mala</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-2">Tu reseña</label>
+                        <textarea id="reviewText" rows="2" maxlength="300" placeholder="Ej: Me gustó la recomendación porque se ajusta a mi presupuesto y al tiempo de escala..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                    </div>
+                    <button onclick="saveReview()" class="bg-teal-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-teal-700 transition whitespace-nowrap">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>Guardar reseña
+                    </button>
+                </div>
+
+                <div id="reviewMessage" class="hidden text-xs font-semibold rounded-xl px-3 py-2"></div>
+
+                <div class="border-t border-slate-200 pt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-sm text-slate-700">Reseñas guardadas</h4>
+                        <span id="reviewCount" class="text-[11px] font-bold bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">0 reseñas</span>
+                    </div>
+                    <div id="reviewsList" class="space-y-3">
+                        <p class="text-xs text-slate-400">Aún no hay reseñas guardadas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbot -->
+            <div class="glass-panel rounded-3xl p-6 shadow-xl space-y-4">
+                <div class="flex items-center space-x-3 text-slate-800">
+                    <i class="fa-solid fa-robot text-teal-600 text-xl"></i>
+                    <h3 class="font-bold text-md">¿Tienes alguna consulta rápida adicional?</h3>
+                </div>
+                <div id="chatHistory" class="bg-white/50 rounded-2xl p-4 h-32 overflow-y-auto space-y-2 text-xs text-slate-700 border border-slate-200">
+                    <div class="bg-teal-50 p-2 rounded-lg max-w-xs">¡Hola! Puedo ayudarte con dudas sobre transporte expreso, consigna de equipaje o facilidades del aeropuerto.</div>
+                </div>
+                <div class="flex space-x-2">
+                    <input type="text" id="chatInput" placeholder="Ej: ¿Dónde puedo guardar mis maletas?" class="flex-grow bg-white border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <button onclick="sendChatMessage()" class="bg-teal-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-teal-700 transition">Enviar</button>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="exportItinerary()" class="bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-xl shadow hover:bg-slate-900 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Guardar Itinerario (.txt)</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="max-w-5xl mx-auto w-full text-center mt-6 text-xs text-slate-400">
+        <p>AeroGuía AI PMV - Kiosco Interactivo para Aeropuertos &copy; 2026</p>
+    </footer>
+
+    <script>
+        const BACKEND_URL = ''; // Mismo origen
+
+        const profile = {
+            travelerType: '',
+            timeAvailable: '',
+            budget: '',
+            interests: []
+        };
+
+        let currentLanguage = 'es';
+        let currentRecommendations = null;
+        const REVIEWS_STORAGE_KEY = 'aeroguia_reviews';
+
+        const i18n = {
+            es: { title1: "¿Con quién viajas hoy?", title2: "¿De cuánto tiempo dispones?", title3: "¿Cuál es tu presupuesto estimado?", title4: "¿Qué actividades te interesan?", step: "Paso" },
+            en: { title1: "Who are you traveling with?", title2: "How much time do you have?", title3: "What is your estimated budget?", title4: "What activities interest you?", step: "Step" },
+            fr: { title1: "Avec qui voyagez-vous?", title2: "Combien de temps avez-vous?", title3: "Quel est votre budget estimé?", title4: "Quelles activités vous intéressent?", step: "Étape" },
+            pt: { title1: "Com quem você está viajando?", title2: "Quanto tempo você tem?", title3: "Qual é o seu orçamento estimado?", title4: "Quais atividades lhe interesam?", step: "Etapa" }
+        };
+
+        function changeLanguage() {
+            currentLanguage = document.getElementById('langSelect').value;
+        }
+
+        function selectOption(key, value, currentStep) {
+            profile[key] = value;
+            document.getElementById(`step${currentStep}`).classList.add('hidden');
+            
+            const nextStep = currentStep + 1;
+            document.getElementById(`step${nextStep}`).classList.remove('hidden');
+            document.getElementById('stepBadge').innerText = `${i18n[currentLanguage].step} ${nextStep} de 4`;
+            
+            if (nextStep === 2) document.getElementById('wizardTitle').innerText = i18n[currentLanguage].title2;
+            if (nextStep === 3) document.getElementById('wizardTitle').innerText = i18n[currentLanguage].title3;
+            if (nextStep === 4) document.getElementById('wizardTitle').innerText = i18n[currentLanguage].title4;
+        }
+
+        function toggleInterest(checkbox) {
+            const label = checkbox.closest('label');
+            if (checkbox.checked) {
+                profile.interests.push(checkbox.value);
+                label.classList.add('border-teal-500', 'bg-teal-50');
+            } else {
+                profile.interests = profile.interests.filter(i => i !== checkbox.value);
+                label.classList.remove('border-teal-500', 'bg-teal-50');
+            }
+        }
+
+        async function generateRecommendations() {
+            document.getElementById('wizardCard').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/recommendations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...profile, language: currentLanguage })
+                });
+
+                const result = await response.json();
+                document.getElementById('loadingState').classList.add('hidden');
+
+                if (result.success && result.data) {
+                    currentRecommendations = result.data;
+                    renderResults(result.data);
+                } else {
+                    console.error("Error del servidor:", result.error);
+                    alert("Error: " + (result.error || "No se pudieron cargar las recomendaciones."));
+                    resetWizard();
+                }
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                document.getElementById('loadingState').classList.add('hidden');
+                alert("Error de conexión con el backend de AeroGuía.");
+                resetWizard();
+            }
+        }
+
+        function renderResults(data) {
+            document.getElementById('resultsCard').classList.remove('hidden');
+            document.getElementById('profileSummary').innerText = `${profile.travelerType} | ${profile.timeAvailable} | ${profile.budget}`;
+
+            renderCityRecommendation(data.recommendedCity, data.alternativeCities);
+            document.getElementById('reviewCityBadge').innerText = data.recommendedCity?.name || 'Ciudad recomendada';
+            renderReviews();
+            renderList('accommodationsList', data.accommodations);
+            renderList('gastronomyList', data.gastronomy);
+            renderList('activitiesList', data.activities);
+        }
+
+        function renderCityRecommendation(city, alternatives = []) {
+            if (!city) return;
+
+            document.getElementById('recommendedCityName').innerText = city.name || 'Ciudad recomendada';
+            document.getElementById('recommendedCityCountry').innerText = city.country || '';
+            document.getElementById('recommendedCityDescription').innerText = city.description || '';
+            document.getElementById('cityIcon').className = `fa-solid ${city.icon || 'fa-location-dot'} text-2xl`;
+            document.getElementById('reviewCityBadge').innerText = city.name || 'Ciudad recomendada';
+
+            const tags = document.getElementById('recommendedCityTags');
+            tags.innerHTML = '';
+            (city.tags || []).forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'bg-teal-50 text-teal-700 border border-teal-100 text-[11px] font-bold px-2.5 py-1 rounded-full';
+                chip.innerText = tag;
+                tags.appendChild(chip);
+            });
+
+            const alt = document.getElementById('alternativeCities');
+            alt.innerHTML = '';
+            alternatives.forEach((item, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'w-full flex items-center justify-between gap-3 text-sm text-left rounded-xl px-2 py-2 hover:bg-teal-50 transition group';
+                button.title = 'Usar esta ciudad como recomendación principal';
+                button.innerHTML = `
+                    <span>
+                        <span class="font-bold text-slate-700 group-hover:text-teal-700">${item.name}</span>
+                        <span class="block text-[10px] text-slate-400 mt-0.5">Haz clic para seleccionar</span>
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <span class="text-[10px] text-slate-400">${(item.tags || []).slice(0, 1).join('')}</span>
+                        <i class="fa-solid fa-arrow-right-arrow-left text-[10px] text-teal-500 opacity-70"></i>
+                    </span>`;
+                button.addEventListener('click', () => selectRecommendedCity(index));
+                alt.appendChild(button);
+            });
+        }
+
+        function selectRecommendedCity(alternativeIndex) {
+            if (!currentRecommendations) return;
+
+            const alternatives = currentRecommendations.alternativeCities || [];
+            const selectedCity = alternatives[alternativeIndex];
+            if (!selectedCity) return;
+
+            const previousMain = currentRecommendations.recommendedCity;
+            const nextAlternatives = alternatives.filter((_, index) => index !== alternativeIndex);
+            if (previousMain) nextAlternatives.unshift(previousMain);
+
+            currentRecommendations.recommendedCity = selectedCity;
+            currentRecommendations.alternativeCities = nextAlternatives.slice(0, 2);
+
+            renderCityRecommendation(
+                currentRecommendations.recommendedCity,
+                currentRecommendations.alternativeCities
+            );
+        }
+
+        function renderList(elementId, items) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            (items || []).forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white/80 p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
+                        <span class="text-[10px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-md">${item.tag || 'Popular'}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">${item.description}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+
+        function getStoredReviews() {
+            try {
+                return JSON.parse(localStorage.getItem(REVIEWS_STORAGE_KEY) || '[]');
+            } catch (e) {
+                console.error('No fue posible leer las reseñas guardadas:', e);
+                return [];
+            }
+        }
+
+        function saveReview() {
+            const textEl = document.getElementById('reviewText');
+            const ratingEl = document.getElementById('reviewRating');
+            const messageEl = document.getElementById('reviewMessage');
+            const text = textEl.value.trim();
+            const rating = Number(ratingEl.value);
+            const city = currentRecommendations?.recommendedCity;
+
+            if (!city) {
+                showReviewMessage('Primero genera una recomendación.', false);
+                return;
+            }
+
+            if (text.length < 5) {
+                showReviewMessage('Escribe una reseña de al menos 5 caracteres.', false);
+                textEl.focus();
+                return;
+            }
+
+            const reviews = getStoredReviews();
+            reviews.unshift({
+                id: Date.now(),
+                city: city.name,
+                country: city.country || '',
+                rating,
+                comment: text,
+                profile: `${profile.travelerType} | ${profile.timeAvailable} | ${profile.budget}`,
+                createdAt: new Date().toLocaleString('es-CO')
+            });
+
+            localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
+            textEl.value = '';
+            ratingEl.value = '5';
+            showReviewMessage('Reseña guardada correctamente.', true);
+            renderReviews();
+        }
+
+        function showReviewMessage(message, success) {
+            const el = document.getElementById('reviewMessage');
+            el.innerText = message;
+            el.className = `text-xs font-semibold rounded-xl px-3 py-2 ${success ? 'bg-teal-50 text-teal-700' : 'bg-rose-50 text-rose-700'}`;
+            el.classList.remove('hidden');
+            clearTimeout(window.reviewMessageTimer);
+            window.reviewMessageTimer = setTimeout(() => el.classList.add('hidden'), 3000);
+        }
+
+        function renderReviews() {
+            const reviews = getStoredReviews();
+            const list = document.getElementById('reviewsList');
+            const count = document.getElementById('reviewCount');
+            if (!list || !count) return;
+
+            count.innerText = `${reviews.length} ${reviews.length === 1 ? 'reseña' : 'reseñas'}`;
+            list.innerHTML = '';
+
+            if (!reviews.length) {
+                list.innerHTML = '<p class="text-xs text-slate-400">Aún no hay reseñas guardadas.</p>';
+                return;
+            }
+
+            reviews.forEach(review => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/70 border border-slate-200 rounded-2xl p-4';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-start justify-between gap-3 mb-2';
+
+                const titleWrap = document.createElement('div');
+                const title = document.createElement('div');
+                title.className = 'font-bold text-sm text-slate-800';
+                title.innerText = `${review.city}${review.country ? ', ' + review.country : ''}`;
+                const stars = document.createElement('div');
+                stars.className = 'text-amber-500 text-xs tracking-wide';
+                stars.innerText = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                titleWrap.appendChild(title);
+                titleWrap.appendChild(stars);
+
+                const date = document.createElement('span');
+                date.className = 'text-[10px] text-slate-400 whitespace-nowrap';
+                date.innerText = review.createdAt;
+
+                header.appendChild(titleWrap);
+                header.appendChild(date);
+
+                const comment = document.createElement('p');
+                comment.className = 'text-xs text-slate-600';
+                comment.innerText = review.comment;
+
+                const profileInfo = document.createElement('p');
+                profileInfo.className = 'text-[10px] text-slate-400 mt-2';
+                profileInfo.innerText = `Perfil: ${review.profile}`;
+
+                card.appendChild(header);
+                card.appendChild(comment);
+                card.appendChild(profileInfo);
+                list.appendChild(card);
+            });
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatHistory = document.getElementById('chatHistory');
+            const userMsg = document.createElement('div');
+            userMsg.className = "bg-slate-200 p-2 rounded-lg max-w-xs ml-auto text-right";
+            userMsg.innerText = message;
+            chatHistory.appendChild(userMsg);
+            input.value = '';
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, language: currentLanguage })
+                });
+
+                const result = await response.json();
+                const botMsg = document.createElement('div');
+                botMsg.className = "bg-teal-50 p-2 rounded-lg max-w-xs";
+                botMsg.innerText = result.reply || "Servicio no disponible temporalmente.";
+                chatHistory.appendChild(botMsg);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function resetWizard() {
+            document.getElementById('resultsCard').classList.add('hidden');
+            document.getElementById('wizardCard').classList.remove('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.add('hidden');
+            document.getElementById('stepBadge').innerText = `${i18n[currentLanguage].step} 1 de 4`;
+            document.getElementById('wizardTitle').innerText = i18n[currentLanguage].title1;
+        }
+
+        renderReviews();
+
+        function exportItinerary() {
+            if (!currentRecommendations) return;
+            let text = `=== AeroGuía AI - Tu Itinerario Personalizado ===\n\n`;
+            text += `Perfil: ${profile.travelerType} | Presupuesto: ${profile.budget} | Tiempo: ${profile.timeAvailable}\n\n`;
+
+            if (currentRecommendations.recommendedCity) {
+                const city = currentRecommendations.recommendedCity;
+                text += `--- CIUDAD RECOMENDADA ---\n`;
+                text += `${city.name}, ${city.country}: ${city.description}\n`;
+                if (currentRecommendations.alternativeCities?.length) {
+                    text += `Alternativas: ${currentRecommendations.alternativeCities.map(c => c.name).join(', ')}\n`;
+                }
+                text += `\n`;
+            }
+            
+            text += `--- ALOJAMIENTO ---\n`;
+            currentRecommendations.accommodations.forEach(i => text += `- ${i.name}: ${i.description}\n`);
+            
+            text += `\n--- GASTRONOMÍA ---\n`;
+            currentRecommendations.gastronomy.forEach(i => text += `- ${i.name}: ${i.description}\n`);
+
+            text += `\n--- ACTIVIDADES ---\n`;
+            currentRecommendations.activities.forEach(i => text += `- ${i.name}: ${i.description}\n`);
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Itinerario_AeroGuia.txt';
+            a.click();
+        }
+    </script>
+</body>
+</html>
