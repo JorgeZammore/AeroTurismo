@@ -1,0 +1,12 @@
+{
+  "name": "aeroguia-local-pmv",
+  "version": "1.2.0",
+  "description": "PMV Kiosco Interactivo AeroGuía - modo 100% local y sin dependencias externas",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
