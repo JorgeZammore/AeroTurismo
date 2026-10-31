@@ -1,41 +1,26 @@
-# AeroGuía - modo 100% local
+# AeroGuía — versión 100 % frontend
 
-Esta versión no usa Gemini, Google AI ni ninguna API externa. Tampoco necesita paquetes npm externos.
+Esta versión está preparada para **GitHub Pages**.
 
-## Ejecutar
+## Características
 
-Solo necesitas Node.js 20 o superior:
+- No utiliza backend.
+- No utiliza Node.js para ejecutarse.
+- No utiliza APIs externas para recomendaciones o chat.
+- Las recomendaciones se generan con lógica JavaScript local.
+- Permite cambiar la ciudad recomendada.
+- Las reseñas se guardan en `localStorage` del navegador.
+- El chat usa respuestas locales preconfiguradas.
+- Permite exportar el itinerario a `.txt`.
 
-```bash
-npm start
-```
+## Publicar en GitHub Pages
 
-También puedes ejecutar directamente:
+1. Sube `index.html`, `.nojekyll` y este `README.md` a la raíz de la rama `main`.
+2. En GitHub abre **Settings > Pages**.
+3. En **Build and deployment**, selecciona **Deploy from a branch**.
+4. Selecciona la rama **main** y la carpeta **/(root)**.
+5. Guarda los cambios.
 
-```bash
-node server.js
-```
+GitHub Pages podrá abrir `index.html` directamente sin ejecutar ningún servidor.
 
-Abrir en el navegador:
-
-http://localhost:3000
-
-## Validar backend
-
-http://localhost:3000/api/health
-
-Debe responder con `mode: "local"` y `externalApi: false`.
-
-## Pruebas incluidas
-
-- Recomendaciones de alojamiento, gastronomía y actividades.
-- Combinaciones variables según tipo de viajero, tiempo, presupuesto e intereses.
-- Variación aleatoria entre pruebas para no devolver siempre las mismas tarjetas.
-- Chat local con respuestas para equipaje, comida, transporte, alojamiento, tiempo de escala, vuelos y compras.
-- Respuestas generales de respaldo.
-- Español e inglés en el contenido local principal.
-- No requiere `.env`, API key ni Internet.
-## Ciudad recomendada
-
-La versión local ahora genera una **ciudad principal recomendada** y dos alternativas según tipo de viajero, presupuesto e intereses. La ciudad también se incluye al exportar el itinerario.
-
+> Nota: la interfaz usa Tailwind CSS y Font Awesome desde CDN, por lo que el navegador necesita Internet para cargar esos estilos e iconos. La lógica de negocio, recomendaciones, chat y reseñas sí funciona completamente en el navegador sin backend.
